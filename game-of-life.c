@@ -6,6 +6,8 @@
 
 #define ROWS 45
 #define COLS 150
+#define GENERATIONS 200
+#define SPEED 250000 // 1 second = 1000000 microseconds
 
 void red();
 void setLimits(char universe[ROWS][COLS]);
@@ -29,7 +31,7 @@ int main(int argc, char *argv[]) {
     printf("\nGenerating game with %.0f%% distribution...\n\n", (distribution*100));
     initialConditions(universe, distribution);
     printUniverse(universe);
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < GENERATIONS; i++) {
         int results[(ROWS-2)*(COLS-2)];
         checkConditions(universe, results);
         changeOrder(universe, results);
@@ -63,7 +65,7 @@ void setLimits(char universe[ROWS][COLS]) {
  * 
  */
 void printUniverse(char universe[ROWS][COLS]) {
-    usleep(500000);
+    usleep(SPEED);
     printf("\n\n");
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++) {
