@@ -4,16 +4,16 @@
 #include <math.h>
 #include <time.h>
 
-#define ROWS  45
+#define ROWS 45
 #define COLS 150
 
 void red();
 void setLimits(char universe[ROWS][COLS]);
 void printUniverse(char universe[ROWS][COLS]);
 void initialConditions(char universe[ROWS][COLS], float distribution);
-void checkConditions(char universe[ROWS][COLS]);
+void checkConditions(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]);
 int getResult(char input);
-
+void changeOrder(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]);
 
 int main(int argc, char *argv[]) {
     char universe[ROWS][COLS];
@@ -30,7 +30,9 @@ int main(int argc, char *argv[]) {
     initialConditions(universe, distribution);
     printUniverse(universe);
     for (int i = 0; i < 100; i++) {
-        checkConditions(universe);
+        int results[(ROWS-2)*(COLS-2)];
+        checkConditions(universe, results);
+        changeOrder(universe, results);
         printUniverse(universe);
     }
     return (0);
@@ -99,7 +101,8 @@ void initialConditions(char universe[ROWS][COLS], float distribution) {
  * @param universe two dimentional space.
  * 
  */
-void checkConditions(char universe[ROWS][COLS]) {
+void checkConditions(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]) {
+    int matrixPos = 0;
     for (int row = 1; row < ROWS-1; row++) {
         for (int col = 1; col < COLS-1; col++) {
             int counter = 0;
@@ -171,15 +174,37 @@ void checkConditions(char universe[ROWS][COLS]) {
                     break;
                 }
             }
-            if (universe[row][col] == '*' && counter >= 2 && counter <= 3) {
-                universe[row][col] = '*';
-            } else if (universe[row][col] == ' ' && counter == 3) {
-                universe[row][col] = '*';
-            } else universe[row][col] = ' ';
+            results[matrixPos] = counter;
+            matrixPos++;
         }
     }
 }
 
+/**
+ * Function that changes the values of the matrix.
+ * 
+ * @param universe two dimentional space.
+ * @param results array with results from cell count.
+ * 
+ */
+void changeOrder(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]) {
+    int position = 0;
+    // for (int x = 0; x < (ROWS-2)*(COLS-2); x++) {
+    //     printf("\n  %d: \t%d", x, results[x]);
+    // }
+    for (int row = 1; row < ROWS-1; row++) {
+        for (int col = 1; col < COLS-1; col++) {
+            if (universe[row][col] == '*' && results[position] >= 2 && results[position] <= 3) {
+                universe[row][col] = '*';
+            } else if (universe[row][col] == ' ' && results[position] == 3) {
+                universe[row][col] = '*';
+            } else universe[row][col] = ' ';
+            position++;
+        }
+    }
+
+}
+ 
 /**
  * Function that checks if a given cell is alive or dead.
  * 
