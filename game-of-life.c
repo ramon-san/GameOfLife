@@ -4,9 +4,9 @@
 #include <math.h>
 #include <time.h>
 
-#define ROWS 45
-#define COLS 150
-#define GENERATIONS 200
+#define ROWS 48
+#define COLS 175
+#define GENERATIONS 1000
 #define SPEED 250000 // 1 second = 1000000 microseconds
 
 void red();
@@ -17,6 +17,12 @@ void checkConditions(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]);
 int getResult(char input);
 void changeOrder(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]);
 
+/**
+ * Main function of our code.
+ * 
+ * @param argv the program expects a number between 0 and 1 when running the code.
+ * 
+ */
 int main(int argc, char *argv[]) {
     char universe[ROWS][COLS];
     float distribution = atof(argv[1]);
@@ -63,6 +69,8 @@ void setLimits(char universe[ROWS][COLS]) {
 /**
  * Function that prints out current state of our universe.
  * 
+ * @param universe two dimensional space.
+ * 
  */
 void printUniverse(char universe[ROWS][COLS]) {
     usleep(SPEED);
@@ -79,7 +87,7 @@ void printUniverse(char universe[ROWS][COLS]) {
 /**
  * Function that starts our universe based on given distribution.
  * 
- * @param universe two dimentional space.
+ * @param universe two dimensional space.
  * @param distribution percentage of living cells at the begining.
  * 
  */
@@ -100,7 +108,8 @@ void initialConditions(char universe[ROWS][COLS], float distribution) {
  *    Lower left limit     [ROWS-2][1]
  *    Lower right limit    [ROWS-2][COLS-2]
  * 
- * @param universe two dimentional space.
+ * @param universe two dimensional space.
+ * @param results array with results from neighboring cell count.
  * 
  */
 void checkConditions(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]) {
@@ -115,6 +124,8 @@ void checkConditions(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]) 
                         counter += getResult(universe[ROWS-2][COLS-2]);
                     } else if (row-1 == 0) {
                         counter += getResult(universe[ROWS-2][col-1]);
+                    } else if (col-1 == 0) {
+                        counter += getResult(universe[row-1][COLS-2]);
                     } else {
                         counter += getResult(universe[row-1][col-1]);
                     }
@@ -131,6 +142,8 @@ void checkConditions(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]) 
                         counter += getResult(universe[ROWS-2][1]);
                     } else if (row-1 == 0) {
                         counter += getResult(universe[ROWS-2][col+1]);
+                    } else if (col+1 == COLS-1) {
+                        counter += getResult(universe[row-1][1]);
                     } else {
                         counter += getResult(universe[row-1][col+1]);
                     }
@@ -154,6 +167,8 @@ void checkConditions(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]) 
                         counter += getResult(universe[1][COLS-2]);
                     } else if (row+1 == ROWS-1) {
                         counter += getResult(universe[1][col-1]);
+                    } else if (col-1 == 0) {
+                        counter += getResult(universe[row+1][COLS-2]);
                     } else {
                         counter += getResult(universe[row+1][col-1]);
                     }
@@ -170,7 +185,9 @@ void checkConditions(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]) 
                         counter += getResult(universe[1][1]);
                     } else if (row+1 == ROWS-1) {
                         counter += getResult(universe[1][col+1]);
-                    } else {
+                    } else if (col+1 == COLS-1) {
+                        counter += getResult(universe[row+1][1]);
+                    }else {
                         counter += getResult(universe[row+1][col+1]);
                     }
                     break;
@@ -185,15 +202,12 @@ void checkConditions(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]) 
 /**
  * Function that changes the values of the matrix.
  * 
- * @param universe two dimentional space.
- * @param results array with results from cell count.
+ * @param universe two dimensional space.
+ * @param results array with results from neighboring cell count.
  * 
  */
 void changeOrder(char universe[ROWS][COLS], int results[(ROWS-2)*(COLS-2)]) {
     int position = 0;
-    // for (int x = 0; x < (ROWS-2)*(COLS-2); x++) {
-    //     printf("\n  %d: \t%d", x, results[x]);
-    // }
     for (int row = 1; row < ROWS-1; row++) {
         for (int col = 1; col < COLS-1; col++) {
             if (universe[row][col] == '*' && results[position] >= 2 && results[position] <= 3) {
